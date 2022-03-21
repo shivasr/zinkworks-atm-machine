@@ -16,7 +16,9 @@ public class AccountBalance {
 
     private String overdraft;
 
-    String message;
+    private String message;
+
+    private String returnCode;
 
     @Builder.Default
     boolean success = true;

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Test cases for the vendingUtil.
  */
-public class VendingUtilTest {
+public class    VendingUtilTest {
 
     private static VendingUtil vendingUtil;
     private static Map<Integer, Currency> mapOfNotesToCurrency;
@@ -27,21 +27,31 @@ public class VendingUtilTest {
 
         mapOfNotesToCurrency = new HashMap<>();
 
-        mapOfNotesToCurrency.put(100, Currency.builder()
+        mapOfNotesToCurrency.put(50, Currency.builder()
                 .number(10)
-                .currency(100)
+                .currency(50)
+                .build());
+
+        mapOfNotesToCurrency.put(20, Currency.builder()
+                .number(30)
+                .currency(20)
                 .build());
 
         mapOfNotesToCurrency.put(10, Currency.builder()
-                .number(13)
+                .number(30)
                 .currency(10)
+                .build());
+
+        mapOfNotesToCurrency.put(20, Currency.builder()
+                .number(20)
+                .currency(5)
                 .build());
     }
 
     @Test
     public void calculateNotes_Case1_default() throws ATMApplicationException {
 
-        List<Currency> actualCurrencies = vendingUtil.calculateExactNotes(250, mapOfNotesToCurrency);
+        List<Currency> actualCurrencies = vendingUtil.calculateExactNotes(1000, mapOfNotesToCurrency);
         List<Currency> expectedCurrencies = Arrays.asList(new Currency[] {
                 Currency.builder()
                         .currency(100)

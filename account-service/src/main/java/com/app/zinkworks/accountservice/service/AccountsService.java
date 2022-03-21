@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 @Service
 public interface AccountsService {
 
-    boolean validatePin(String accountNumber, String pin);
+    boolean validatePin(String accountNumber, String pin) throws AccountsServiceException;
 
     AccountBalance getAccountBalance(String accountNumber) throws AccountsServiceException; ;
 

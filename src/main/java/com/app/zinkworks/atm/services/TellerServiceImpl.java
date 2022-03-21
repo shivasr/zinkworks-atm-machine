@@ -54,6 +54,22 @@ public class TellerServiceImpl implements TellerService {
     }
 
     @Override
+    public boolean commitCurreencyDispense(int amount, List<Currency> currencies) throws ATMApplicationException {
+        List<CurrencyEntity> allRecords = currencyRepository.findAll();
+        Map<Integer, Currency> mapOfNotesToCurrency
+                = allRecords.stream()
+                .map(currencyEntity -> CurrencyMapper.toCurrency(currencyEntity))
+                .collect(Collectors.toMap(key -> key.getCurrency(), value -> value));
+
+        allRecords.forEach(currencyEntity -> {
+            Currency currency = mapOfNotesToCurrency.get(currencyEntity.getCurrency());
+            currencyEntity.setNumber(currency.getNumber());
+            currencyRepository.save(currencyEntity);
+        });
+        return false;
+    }
+
+    @Override
     public List<Currency> listAllCash() {
         return currencyRepository.findAll().stream()
                 .map(currencyEntity -> CurrencyMapper.toCurrency(currencyEntity))

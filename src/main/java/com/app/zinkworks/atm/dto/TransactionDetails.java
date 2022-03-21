@@ -20,6 +20,8 @@ public class TransactionDetails {
 
     private String newBalance;
 
+    private String returnCode;
+
     private String message;
 
     private String withdrawAmount;

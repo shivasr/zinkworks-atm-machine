@@ -13,5 +13,7 @@ import java.util.List;
 public interface TellerService {
     public List<Currency> findCurrencies(int amount) throws ATMApplicationException;
 
+    public boolean commitCurreencyDispense(int amount, List<Currency> currencies) throws ATMApplicationException;
+
     List<Currency> listAllCash();
 }

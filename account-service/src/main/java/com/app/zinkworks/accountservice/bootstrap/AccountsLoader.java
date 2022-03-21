@@ -28,9 +28,9 @@ public class AccountsLoader implements CommandLineRunner {
 
         AccountEntity accountEntityTwo = AccountEntity.builder()
                 .accountNumber("987654321")
-                .pin("1234")
-                .overdraft(BigDecimal.valueOf(200L))
-                .balance(BigDecimal.valueOf(800))
+                .pin("4321")
+                .overdraft(BigDecimal.valueOf(150))
+                .balance(BigDecimal.valueOf(1230))
                 .build();
         accountsRepository.save(accountEntityTwo);
 

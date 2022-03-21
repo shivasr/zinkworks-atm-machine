@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Service
 public class AccountsServiceImpl implements AccountsService {
 
-    public static final String ACCOUNTS_SERVICE_URI = "http://account-service:3100";
+    public static final String ACCOUNTS_SERVICE_URI = "http://localhost:3100";
     final
     RestTemplate restTemplate;
 
@@ -39,8 +39,13 @@ public class AccountsServiceImpl implements AccountsService {
 
         try {
             responseEntity = restTemplate.postForEntity(ACCOUNTS_SERVICE_URI + "/api/v1/withdraw/" + amount.intValue(), request, TransactionDetails.class);
-        } catch (RestClientException RCEx) {
-            throw new ATMApplicationException(RCEx.getMessage());
+
+            TransactionDetails transactionDetails = responseEntity.getBody();
+            if(!transactionDetails.isSuccess()) {
+                throw new ATMApplicationException(transactionDetails.getMessage());
+            }
+        } catch (RestClientException rcex) {
+            throw new ATMApplicationException("Unidentified issue found. Error: " + rcex.getMessage());
         }
 
         return responseEntity.getBody();

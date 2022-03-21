@@ -41,21 +41,22 @@ public class VendingUtil {
 
             // If currency note are available in the ARM and there are sufficient notes to fulfill the required amount
             if(mapOfCurrencyToAvailableCount.containsKey(notes[i]) &&
-                    mapOfCurrencyToAvailableCount.get(notes[i]).getNumber() >= requiredNotes) {
+                    mapOfCurrencyToAvailableCount.get(notes[i]).getNumber() >= 0) {
                 Currency currency = mapOfCurrencyToAvailableCount.get(notes[i]);
                 int count = currency.getNumber();
-                count -= requiredNotes;
+
+                int assignedNotes = (count >= requiredNotes)? requiredNotes : count;
 
                 // Update the availability in the ATM
-                currency.setNumber(count);
+                currency.setNumber(count - assignedNotes);
                 mapOfCurrencyToAvailableCount.put(notes[i], currency);
                 currencies.add(Currency.builder()
-                        .number(requiredNotes)
+                        .number(assignedNotes)
                         .currency(notes[i])
                         .build());
 
                 // remaining amount after dispensing
-                remaining = remaining % notes[i];
+                remaining -= assignedNotes * notes[i];
             }
         }
 

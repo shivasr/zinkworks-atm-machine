@@ -147,3 +147,11 @@ Sample output (observe that 250 is deducted from the main balance)
     "success": true
 }
 ```
+
+### Error Conditions:
+
+Case 1: Invalid pin
+Case 2: Account with number 1234 does not exist.
+Case 3: You have insufficient balance. 
+Case 4: ATM does not have sufficient currency notes.
+ 

@@ -36,7 +36,7 @@ public class AccountController {
                     .success(false)
                     .message(e.getMessage())
                     .returnCode(e.getReturnCode())
-                    .build(), HttpStatus.BAD_REQUEST);
+                    .build(), HttpStatus.OK);
         }
 
         return ResponseEntity.ok(balance);
@@ -47,9 +47,13 @@ public class AccountController {
     ResponseEntity<TransactionDetails> withdrawMoney(@RequestBody Account account,
                                                      @PathVariable("amount") String amount) {
 
+
         Long amountValue = Long.valueOf(amount);
         TransactionDetails transactionDetails = null;
         try {
+            if(!accountsService.validatePin(account.getAccountNumber(), account.getPin()))
+                throw new AccountsServiceException("01", "Invalid pin.");
+
             transactionDetails = accountsService.withdrawAmount(account.getAccountNumber(),
                                                                                         BigDecimal.valueOf(amountValue));
         } catch (AccountsServiceException e) {
@@ -57,7 +61,7 @@ public class AccountController {
                     .success(false)
                     .message(e.getMessage())
                     .returnCode(e.getReturnCode())
-                    .build(), HttpStatus.BAD_REQUEST);
+                    .build(), HttpStatus.OK);
         }
 
         return ResponseEntity.ok(transactionDetails);

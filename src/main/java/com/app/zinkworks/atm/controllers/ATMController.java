@@ -58,11 +58,15 @@ public class ATMController {
             Long amountLong = Long.valueOf(withdrawalRequest.getAmount());
 
 
-            TransactionDetails details = accountsService.withdrawAmount(withdrawalRequest.getAccountNumber(),
-                                                                                withdrawalRequest.getPin(),
-                                                                                        BigDecimal.valueOf(amountLong));
+            currencies = tellerService.findCurrencies(Integer.valueOf(withdrawalRequest.getAmount()));
 
-            currencies = tellerService.findCurrencies(Integer.valueOf(details.getWithdrawAmount()));
+            TransactionDetails details = accountsService.withdrawAmount(withdrawalRequest.getAccountNumber(),
+                    withdrawalRequest.getPin(),
+                    BigDecimal.valueOf(amountLong));
+
+            if(details.isSuccess()) {
+                tellerService.commitCurreencyDispense(Integer.valueOf(withdrawalRequest.getAmount()), currencies);
+            }
         } catch (ATMApplicationException e) {
             WithdrawResponse withdrawResponse = WithdrawResponse.builder()
                     .message(e.getMessage())

@@ -22,8 +22,12 @@ public class AccountsServiceImpl implements AccountsService {
     }
 
     @Override
-    public boolean validatePin(String accountNumber, String pin) {
+    public boolean validatePin(String accountNumber, String pin) throws AccountsServiceException {
         AccountEntity accountEntity = accountsRepository.findAccountEntityByAccountNumber(accountNumber);
+
+        Optional.ofNullable(accountEntity).orElseThrow(
+                () -> new AccountsServiceException("02",
+                        String.format("Account with number %s does not exist.", accountNumber)));
 
         if(accountEntity.getPin().equalsIgnoreCase(pin))
             return true;
@@ -31,14 +35,19 @@ public class AccountsServiceImpl implements AccountsService {
     }
 
     @Override
-    public AccountBalance getAccountBalance(String accountNumber) {
+    public AccountBalance getAccountBalance(String accountNumber) throws AccountsServiceException {
         AccountEntity accountEntity = accountsRepository.findAccountEntityByAccountNumber(accountNumber);
+
+        Optional.ofNullable(accountEntity).orElseThrow(
+                () -> new AccountsServiceException("02",
+                        String.format("Account with number %s does not exist.", accountNumber)));
 
         return AccountBalance.builder()
                     .accountNumber(accountNumber)
                     .balance(accountEntity.getBalance().toPlainString())
                     .overdraft(accountEntity.getOverdraft().toPlainString())
                 .returnCode("00")
+                .success(true)
                 .message("Transaction successful.")
                 .build();
     }
@@ -49,7 +58,7 @@ public class AccountsServiceImpl implements AccountsService {
         AccountEntity accountEntity = accountsRepository.findAccountEntityByAccountNumber(accountNumber);
         Optional.ofNullable(accountEntity).orElseThrow(
                 () -> new AccountsServiceException("02",
-                        String.format("Account with number {} does not exist.", accountNumber)));
+                        String.format("Account with number %s does not exist.", accountNumber)));
 
 
         if(accountEntity.getBalance().add(accountEntity.getOverdraft()).compareTo(amount) < 0)
@@ -63,7 +72,13 @@ public class AccountsServiceImpl implements AccountsService {
         if(prevBalance.compareTo(amount) >= 0) {
             newBalance = prevBalance.subtract(amount);
         } else {
-            newOverdraftBalance = prevOverdraftBalance.subtract(amount);
+            BigDecimal excessIfAny = amount.subtract(prevBalance);
+            if(newOverdraftBalance.compareTo(excessIfAny) >= 0){
+
+                newOverdraftBalance = prevOverdraftBalance.subtract(excessIfAny);
+                newBalance = prevBalance.add(excessIfAny).subtract(amount);
+
+            }
         }
         accountEntity.setBalance(newBalance);
         accountEntity.setOverdraft(newOverdraftBalance);
@@ -77,6 +92,7 @@ public class AccountsServiceImpl implements AccountsService {
                 .newBalance(newBalance.toPlainString())
                 .withdrawAmount(amount.toPlainString())
                 .returnCode("00")
+                .success(true)
                 .message("Transaction successful.")
                 .build();
     }
