@@ -1,0 +1,19 @@
+version: '2'
+services:
+  account-service:
+    container_name: account-service
+    build:
+      context: account-service
+      dockerfile: Dockerfile
+    image: shivasrr/account-service:1.0.0
+    ports:
+      - 3100:3100
+  atm-service:
+    container_name: atm-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: shivasr/atm-service:1.0.0
+    ports:
+      - 3000:3000
+    

@@ -1,0 +1,130 @@
+openapi: 3.0.0
+servers:
+    - description: ATM Microservices API
+      url: http://localhost:8000/atm-service/api/v1
+info:
+    description: This API for ATM microservices
+    version: "1.0.0"
+    title: ATM Microservices API
+    contact:
+        email: shivakumar.ramannavar@gmail.com
+    license:
+        name: Apache 2.0
+        url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+tags:
+    - name: admins
+      description: Secured Admin-only calls
+    - name: developers
+      description: Operations available to regular developers
+paths:
+    /atm/balance:
+        get:
+            tags:
+                - developers
+            summary: Lists all currency notes in the ATM
+            operationId: listAvailableCash
+            description: |
+                Lists all currency notes in the ATM
+            responses:
+                '200':
+                    description: Currency notes in the ATM machine
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Currency'
+    /withdraw:
+        post:
+            tags:
+                - developers
+            summary: Withdraw currency from the ATM after successful validation
+            operationId: withdrawMoney
+            description: |
+                Withdraw money from the ATM for an user with account number.
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/WithdrawRequest'
+            responses:
+                '200':
+                    description: Money withdrawal successful
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/WithdrawResponse'
+                '400':
+                    description: Invalid number format
+                '403':
+                    description: Invalid pin
+                '404':
+                    description: Invalid account number
+                '500':
+                    description: ATM does not currency notes.
+    /deposit:
+        post:
+            tags:
+                - admins
+            summary: Adds money into the ATM machine
+            operationId: addMoney
+            description: Adds currency into the ATM machine
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            type: array
+                            items:
+                                $ref: '#/components/schemas/Currency'
+            responses:
+                '201':
+                    description: Money added successfully
+                '400':
+                    description: Invalid currency
+                '403':
+                    description: Invalid user
+components:
+    schemas:
+        WithdrawRequest:
+            type: object
+            required:
+                - amount
+                - cardNumber
+                - pin
+            properties:
+                amount:
+                    type: integer
+                    format: int32
+                    example: 250
+                cardNumber:
+                    type: string
+                    maxLength: 16
+                    minLength: 16
+                    example: 5555555555554444
+                pin:
+                    type: string
+                    maxLength: 4
+                    example: 1234
+        WithdrawResponse:
+            type: object
+            properties:
+                message:
+                    type: string
+                notes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/Currency'
+        Currency:
+            type: object
+            required:
+                - currency
+                - number
+            properties:
+                currency:
+                    type: integer
+                    format: int32
+                    example: 100
+                number:
+                    type: integer
+                    format: int32
+                    example: 10
